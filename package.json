@@ -1,0 +1,32 @@
+{
+  "name": "bitshares-health",
+  "version": "0.9.0",
+  "description": "Monitor the health of your Bitshares instance",
+  "main": "bin/cli.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "btshealth": "bin/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CryptoBridge/bitshares-health.git"
+  },
+  "keywords": [
+    "bitshares",
+    "health",
+    "monitor"
+  ],
+  "author": "Jay Quijino <jquijino@crypto-bridge.org> (http://crypto-bridge.org)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CryptoBridge/bitshares-health/issues"
+  },
+  "homepage": "https://github.com/CryptoBridge/bitshares-health#readme",
+  "dependencies": {
+    "bitsharesjs": "^1.8.0",
+    "bitsharesjs-ws": "^1.5.4",
+    "got": "^8.3.2"
+  }
+}
