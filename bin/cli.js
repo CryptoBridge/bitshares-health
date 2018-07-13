@@ -31,6 +31,11 @@ function parseArgs() {
     const args = parseArgs();
     const inst = await HealthCheck.getInstance(...args);
     const app = express();
+
+    app.get('/health', (req, res) => {
+        res.sendStatus(204);
+    });
+
     app.get('/', asyncMiddleware(async(req, res) => {
         const status = { healthy: true };
         try {
