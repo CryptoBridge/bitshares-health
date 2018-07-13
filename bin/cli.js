@@ -52,6 +52,32 @@ function parseArgs() {
         res.json(status);
     }));
 
+    app.get('/bitshares', asyncMiddleware(async(req, res) => {
+        const status = { healthy: true };
+        try {
+            status.bitshares = await inst.bitshares();
+        } catch (err) {
+            res.status(502);
+            status.healthy = false;
+            status.bitshares = { error: err.message };
+            console.error(`Error: ${err.message}`);
+        }
+        res.json(status);
+    }));
+
+    app.get('/eswrapper', asyncMiddleware(async(req, res) => {
+        const status = { healthy: true };
+        try {
+            status.esWrapper = await inst.esWrapper();
+        } catch (err) {
+            res.status(502);
+            status.healthy = false;
+            status.esWrapper = { error: err.message };
+            console.error(`Error: ${err.message}`);
+        }
+        res.json(status);
+    }));
+
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
         console.log('Bitshares health check is running on port ' + port);
