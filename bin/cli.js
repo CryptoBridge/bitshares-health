@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+const os = require('os');
 const express = require('express');
 const HealthCheck = require('../lib/healthcheck');
 
@@ -33,11 +34,11 @@ function parseArgs() {
     const app = express();
 
     app.get('/health', (req, res) => {
-        res.sendStatus(204);
+        res.status(200).json({ healthy: true, hostname: os.hostname() });
     });
 
     app.get('/', asyncMiddleware(async(req, res) => {
-        const status = { healthy: true };
+        const status = { healthy: true, hostname: os.hostname() };
         try {
             status.bitshares = await inst.bitshares();
         } catch (err) {
@@ -58,7 +59,7 @@ function parseArgs() {
     }));
 
     app.get('/bitshares', asyncMiddleware(async(req, res) => {
-        const status = { healthy: true };
+        const status = { healthy: true, hostname: os.hostname() };
         try {
             status.bitshares = await inst.bitshares();
         } catch (err) {
@@ -71,7 +72,7 @@ function parseArgs() {
     }));
 
     app.get('/eswrapper', asyncMiddleware(async(req, res) => {
-        const status = { healthy: true };
+        const status = { healthy: true, hostname: os.hostname() };
         try {
             status.esWrapper = await inst.esWrapper();
         } catch (err) {
