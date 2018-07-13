@@ -19,8 +19,17 @@ function asyncMiddleware(fn) {
     };
 }
 
+function parseArgs() {
+    const args = process.argv;
+    if (args[2] === '--es') {
+        return [null, '--es'];
+    }
+    return [args[2], args[3]]
+}
+
 (async function() {
-    const inst = await HealthCheck.getInstance(process.argv[2], process.argv[3]);
+    const args = parseArgs();
+    const inst = await HealthCheck.getInstance(...args);
     const app = express();
     app.get('/', asyncMiddleware(async(req, res) => {
         const status = { healthy: true };
