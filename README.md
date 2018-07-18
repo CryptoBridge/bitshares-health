@@ -14,3 +14,4 @@ Bitshares Health check
 ## Development
 
     nodemon bin/cli.js wss://eu.nodes.bitshares.ws
+    nodemon bin/cli.js wss://eu.nodes.bitshares.ws http://95.216.32.252:5010

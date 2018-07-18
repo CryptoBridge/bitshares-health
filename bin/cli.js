@@ -4,6 +4,8 @@ const os = require('os');
 const express = require('express');
 const HealthCheck = require('../lib/healthcheck');
 
+console.log = () => {};
+
 process.on('uncaughtException', err => {
     console.error(err.message);
     process.exit(1);
@@ -30,8 +32,12 @@ function parseArgs() {
 
 (async function() {
     const args = parseArgs();
-    const inst = await HealthCheck.getInstance(...args);
     const app = express();
+    let inst = await HealthCheck.getInstance(undefined, ...args);
+
+    setInterval(async () => {
+        inst = await HealthCheck.getInstance({ reconnect: true }, ...args);
+    }, process.env.RECONNECT_INTERVAL || 30000);
 
     app.get('/health', (req, res) => {
         res.status(200).json({ healthy: true, hostname: os.hostname() });
@@ -86,7 +92,7 @@ function parseArgs() {
 
     const port = process.env.PORT || 3000;
     app.listen(port, () => {
-        console.log('Bitshares health check is running on port ' + port);
+        console.info('Bitshares health check is running on port ' + port);
         inst.bitshares().catch(err => console.error(`Unhealthy ${err}`));
         inst.esWrapper().catch(err => console.error(`Unhealthy ${err}`));
     });
