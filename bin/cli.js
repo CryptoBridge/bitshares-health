@@ -3,6 +3,7 @@
 const os = require('os');
 const express = require('express');
 const HealthCheck = require('../lib/healthcheck');
+const pkg = require('../package.json');
 
 console.log = () => {};
 
@@ -41,6 +42,10 @@ function parseArgs() {
 
     app.get('/health', (req, res) => {
         res.status(200).json({ healthy: true, hostname: os.hostname() });
+    });
+
+    app.get('/info', (req, res) => {
+        res.status(200).json({ name: pkg.name, version: pkg.version });
     });
 
     app.get('/', asyncMiddleware(async(req, res) => {
