@@ -25,19 +25,41 @@ function asyncMiddleware(fn) {
 
 function parseArgs() {
     const args = process.argv;
-    if (args[2] === '--es') {
-        return [null, '--es'];
+    let ws = args[2];
+    let es = args[3];
+    if (ws === '--es') {
+        ws = 'ws://localhost:8090';
+        es = `http://${ws.split(/(.*\/\/)+([^:]+)/g)[2]}:5000`;
+    } else if (!ws) {
+        ws = 'ws://localhost:8090';
     }
-    return [args[2], args[3]]
+
+    return [ws, es];
+}
+
+function getErrorInstance(inst, args) {
+    const errorInst = { bitshares: () => Promise.reject(new Error(`Connection to ${args[0]} failed.`)) };
+    errorInst.esWrapper = (args[1] && inst) ? inst.esWrapper : () => Promise.reject(new Error(`Connection to ${args[0]} failed.`));
+    errorInst.esWrapper = () => Promise.reject(new Error(`Connection to ${args[0]} failed.`));
+    return errorInst;
 }
 
 (async function() {
     const args = parseArgs();
     const app = express();
-    let inst = await HealthCheck.getInstance(undefined, ...args);
+    let inst;
+    try {
+        inst = await HealthCheck.getInstance(undefined, ...args);
+    } catch (e) {
+        inst = getErrorInstance(inst, args);
+    }
 
     setInterval(async () => {
-        inst = await HealthCheck.getInstance({ reconnect: true }, ...args);
+        try {
+            inst = await HealthCheck.getInstance({ reconnect: true }, ...args);
+        } catch (e) {
+            inst = getErrorInstance(inst, args);
+        }
     }, process.env.RECONNECT_INTERVAL || 30000);
 
     app.get('/health', (req, res) => {
@@ -99,6 +121,8 @@ function parseArgs() {
     app.listen(port, () => {
         console.info('Bitshares health check is running on port ' + port);
         inst.bitshares().catch(err => console.error(`Unhealthy ${err}`));
-        inst.esWrapper().catch(err => console.error(`Unhealthy ${err}`));
+        if (args[2]) {
+            inst.esWrapper().catch(err => console.error(`Unhealthy ${err}`));
+        }
     });
 }());
