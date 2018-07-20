@@ -1,6 +1,6 @@
 {
   "name": "bitshares-health",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Monitor the health of your Bitshares instance",
   "main": "bin/cli.js",
   "scripts": {
