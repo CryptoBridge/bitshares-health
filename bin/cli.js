@@ -39,8 +39,9 @@ function parseArgs() {
 
 function getErrorInstance(inst, args) {
     const errorInst = { bitshares: () => Promise.reject(new Error(`Connection to ${args[0]} failed.`)) };
-    errorInst.esWrapper = (args[1] && inst) ? inst.esWrapper : () => Promise.reject(new Error(`Connection to ${args[0]} failed.`));
-    errorInst.esWrapper = () => Promise.reject(new Error(`Connection to ${args[0]} failed.`));
+    if (args[1]) {
+        errorInst.esWrapper = inst ? inst.esWrapper : () => Promise.reject(new Error(`Connection to ${args[0]} failed.`));
+    }
     return errorInst;
 }
 
@@ -81,7 +82,7 @@ function getErrorInstance(inst, args) {
             console.error(`Error: ${err.message}`);
         }
         try {
-            status.esWrapper = await inst.esWrapper();
+            status.esWrapper = inst.esWrapper ? await inst.esWrapper() : undefined;
         } catch (err) {
             res.status(502);
             status.healthy = false;
@@ -121,7 +122,7 @@ function getErrorInstance(inst, args) {
     app.listen(port, () => {
         console.info('Bitshares health check is running on port ' + port);
         inst.bitshares().catch(err => console.error(`Unhealthy ${err}`));
-        if (args[2]) {
+        if (args[1]) {
             inst.esWrapper().catch(err => console.error(`Unhealthy ${err}`));
         }
     });
